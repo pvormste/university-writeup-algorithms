@@ -13,6 +13,8 @@
 
 \documentclass[tog]{acmsiggraph}
 
+\usepackage{array}
+\usepackage{amssymb}
 \usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{tikz}
@@ -118,25 +120,241 @@ Die Algorithmen die wir in den folgenden Abschnitten beleuchten werden stammen a
 
 \section{Schnittebenenverfahren}
 
-Your content should be formatted on a US Letter (8.5 inches wide by 11
-inches tall) page size. Please make sure you.re not working on an A4
-page size. Page margins should be set at 0.75 inches on the right,
-left, and top, and one inch at the bottom. Two columns should be used
-throughout your content, except for the title, affiliations, and large
-images or tables which span both columns.
+\subsection*{Grundidee}
 
-To summarize, here are the basic page specifications: 
-\begin{itemize}
-\item page size: 8.5 inches wide by 11 inches wide (not A4)
-\item top margin: 0.75 inches
-\item right margin: 0.75 inches
-\item left margin: 0.75 inches
-\item bottom margin: 1 inch
-\item number of columns: 2
-\item column width: 3.3 inches
-\item column height: 9.25 inches
-\item column gutter: 0.33 inches
-\end{itemize}
+Betrachten wir nun erneut die ILP aus Gleichung \ref{Eq:ILP} und versuchen sie nun zu lösen.\\
+Dabei verwenden wir folgende Lösungsschritte:
+\begin{enumerate}
+\item Bilde die LP-Relaxierung der ILP. Diese ist uns bereits aus Gleichung \ref{Eq:LP} bekannt.\\ Nun sei $x^{*}$ die optimale Lösung zur LP-Relaxierung.
+\item Falls $x^{*}$ ganzzahlig ist, dann ist $x^{*}$ ebenfalls die optimale Lösung zur ILP und der Algorithmus hält an.
+\item Falls $x^{*}$ nicht ganzzahlig ist, dann fügen wir eine weitere Bedingung hinzu, die der optimalen Lösung der LP-Relaxierung widerspricht, aber nicht der optimalen Lösung der ILP.\\
+Dazu betrachten wir folgendes Beispiel mit $x^{*}$ als optimale Lösung zur LP-Relaxierung:\\
+
+\subsubsection*{Beispiel}
+Sei $x^{*}_{i}$ ein Bruch mit:
+\large
+\begin{equation}
+\frac{p}{q} \in \mathbb{Q},\;\; p < q \nonumber
+\end{equation}
+\normalsize
+
+Damit ist $x^{*}$ keine optimale Lösung der ILP.\\
+Durch Hinzunahme der Bedingung $x^{*}_{i} \ge 1$ zur LP-Relaxierung können wir die Lösungssuche verfeinern.\\
+$x^{*}$ ist somit keine zulässige Lösung der LP-Relaxierung.
+
+\item Mit dieser neuen Bedingung berechnen wir erneut eine Lösung für die LP-Relaxierung und beginnen wieder bei Schritt 1.
+
+\end{enumerate}
+
+Das Hinzufügen neuer Bedingungen kann man auch als \textit{Abschneiden unbrauchbarer Lösungen} bezeichnen. Dies führt uns zu sogenannten \textit{Schnittebenen}.\\
+Durch ständiges Abschneiden unbrauchbarer Lösung erlangt man mit der Zeit eine ganzzahlige Lösung in der LP-Relaxierung.\\
+Die Problematik besteht hingegen darin geeignete Schnittebenen zu bestimmen.\\
+Im Jahre 1958 hat Ralph Gomory ein entsprechend brauchbares Verfahren zum Bestimmen solcher Schnittebenen entwickelt welches im Folgenden vorgestellt wird.
+
+\subsection*{Gomory-Schnittebenenverfahren}
+
+Das Verfahren von Ralph Gomory baut auf dem als hier bekannt vorausgesetztem Simplex-Algorithmus auf.\\
+Führen wir den Simplex-Algorithmus auf einer LP-Relaxierung aus, so erhalten wir eine Lösung folgender Form:
+
+\large
+\begin{align}
+\label{Eq:Simplex}
+B^{-1} Ax = B^{-1}b
+\end{align}
+\normalsize
+
+Das dazugehörige optimale Tableau sieht beispielsweise wie folgt aus:
+
+\begin{table}[ht]
+\centering
+\caption{Optimales Tableau einer bestimmten LP-Relaxierung}
+\label{Tb:Optimales Tableau}
+\begin{tabular}{lllll}
+& $x_1$ & $x_2$  & $x_3$ & $x_4$ \\
+\hline
+\multicolumn{1}{|l|}{\large$a_{00}$} & \large$a_{01}$  & \large$a_{02}$ & \large$a_{03}$ & \multicolumn{1}{l|}{\large$a_{04}$} \\ \hline
+\multicolumn{1}{|l|}{\large$a_{10}$} & \large$a_{11}$ & \large$a_{12}$ & \large$a_{13}$ & \multicolumn{1}{l|}{\large$a_{14}$} \\
+\multicolumn{1}{|l|}{\large$a_{20}$} & \large$a_{21}$ & \large$a_{22}$ & \large$a_{23}$ & \multicolumn{1}{l|}{\large$a_{24}$} \\ \hline               
+\large$\underbrace{}_{B^{-1}b}$ &   &   & \multicolumn{2}{l}{\large$\underbrace{\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;}_{B^{-1}A_N}$}      
+\end{tabular}
+\end{table}
+
+Betrachten wir das Ergebnis des Simplex-Algorithmus genauer, so können wir es in Basis-Variablen und Nicht-Basis-Variablen aufteilen. Wir erhalten dann folgende Form:
+
+\large
+\begin{align}
+\label{Eq:SimplexBasis}
+x_B + B^{-1} A_N x_N = B^{-1}b
+\end{align}
+\normalsize
+
+Dabei seien $x_B$ die Basis-Variablen und $x_N$ die Nicht-Basis-Variablen und $A_N$ die Submatrix mit den Koeffizienten der Nicht-Basis-Variablen.\\
+Angenommen in unserem optimalem Tableau der Tabelle \ref{Tb:Optimales Tableau} seien $x_1$ und $x_2$ die Basis-Variablen, dann sind die Spalten von $x_3$ und $x_4$ die Nicht-Basis-Koeffizienten.\\
+Diese können wir zusammenfassen als $\bar{a}_{ij} = (B^{-1} A_j)_i$. \\
+Die Ergebnisspalte des optimalem Tableau beschreiben wir mit $\bar{a}_{i0} = (B^{-1} b)_i$.
+
+Nun selektieren wir aus dem optimalem Tableau eine Zeile, in der $\bar{a}_{i0}$ nicht ganzzahlig ist. Diese hat dann folgende Form:
+
+\large
+\begin{align}
+\label{Eq:Gomory Schritt 1}
+x_i + \sum_{j \in N} \bar{a}_{ij} x_{j} = \bar{a}_{i0}
+\end{align}
+\normalsize
+
+Wir können nun die Koeffizienten der Nicht-Basis-Variablen abrunden und erhalten eine Gleichung die kleiner oder gleich der Gleichung \ref{Eq:Gomory Schritt 1} ist:
+
+\large
+\begin{align}
+\label{Eq:Gomory Schritt 2}
+ x_i + \sum_{j \in N} \lfloor\bar{a}_{ij}\rfloor x_{j} \leq x_i + \sum_{j \in N} \bar{a}_{ij} x_{j} = \bar{a}_{i0}
+\end{align}
+\normalsize
+
+Durch den Zwischenschritt ist es jetzt möglich das $\bar{a}_{i0}$ ebenfalls abzurunden ohne die (Un)Gleichung zu verletzen:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Bedingung}
+ x_i + \sum_{j \in N} \lfloor\bar{a}_{ij}\rfloor x_{j} \leq \lfloor \bar{a}_{i0} \rfloor
+\end{align}
+\normalsize
+
+Diese neue Ungleichung \ref{Eq:Gomory-Bedingung} ist unsere neue Schnitt-Bedingung da sie alle zulässigen nicht-ganzzahligen Lösungen hinter dieser Schnittebene \textit{abschneidet}.\\
+Durch Hinzufügen der neuen Bedingung zur LP-Relaxierung lässt sich nun erneut der Simplex-Algorithmus durchführen. Dies wird solange wiederholt bis eine ganzzahlige Lösung gefunden wird.
+
+\subsection*{Beispiel des Gomory-Verfahren}
+
+\begin{figure*}[t!]
+  \centering
+  \includegraphics[scale=0.40]{images/gomory-example}
+  \caption{Graphische Darstellung des Gomory-Beispiels. (a) zeigt die erste optimale nicht-ganzzahlige Lösung $x^{*}$. (b) zeigt in roter Farbe den ersten Gomory-Schnitt und in blau die zweite optimale nicht-ganzzahlige Lösung $x^{**}$ der LP-Relaxierung. (c) zeigt in blau den neuen Gomory-Schnitt und die optimale ganzzahlige Lösung $x^{***}$ der ILP. }
+  \label{fig:gomory-example}
+\end{figure*}
+
+Für das Beispiel betrachten wir folgende ILP:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel-ILP}
+minimize \;\; x_1 - 2x_2 & \nonumber \\
+subject \;\; to \;\; -4x_1 + 6x_2 &\leq 9 \nonumber \\
+x_1 + x_2 &\leq 4 \nonumber \\
+x_1, x_2 &\geq 0 \nonumber \\
+x_1, x_2 \;\; &integer
+\end{align}
+\normalsize
+
+In Anbetracht des Simplex-Algorithmus müssen wir die ILP nun auch in die Normalform umwandeln:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel-ILP-Normal}
+minimize \;\; x_1 - 2x_2 & \nonumber \\
+subject \;\; to \;\; -4x_1 + 6x_2 + x_3 &= 9 \nonumber \\
+x_1 + x_2 + x_4 &= 4 \nonumber \\
+x_1, ..., x_4 &\geq 0 \nonumber \\
+x_1, ..., x_4 \;\; &integer
+\end{align}
+\normalsize
+
+\subsubsection*{1. Iteration}
+
+Nach Anwendung des Simplex-Algorithmus erhalten wir folgendes optimales Tableau:
+
+
+\begin{table}[ht]
+\begin{center}
+
+\centering
+\caption{Optimales Tableau zum Gomory-Beispiel in der ersten Iteration}
+\label{Tb:Optimales Tableau Gomory Beispiel}
+\begin{tabular}{*5{>{\centering\arraybackslash}m{20pt}} @{}m{0pt}@{}}
+%\begin{tabular}{MMMMM}
+%\begin{tabular}{>{\centering\bfseries}m{30pt} >{\centering}m{30pt} >{\centering}m{30pt} >{\centering}m{30pt} >{\centering\arraybackslash}m{30pt}}
+& $x_1$ & $x_2$  & $x_3$ & $x_4$ \\
+\hline
+\multicolumn{1}{|l|}{\large$-\frac{7}{2}$} & \large$0$  & \large$0$ & \large$-\frac{3}{10}$ & \multicolumn{1}{l|}{\large$-\frac{1}{5}$} \\[2ex] \hline
+\multicolumn{1}{|l|}{\large$\frac{5}{2}$} & \large$0$ & \large$1$ & \large$\frac{1}{10}$ & \multicolumn{1}{l|}{\large$\frac{2}{5}$} \\[2ex]
+\multicolumn{1}{|l|}{\large$\frac{3}{2}$} & \large$1$ & \large$0$ & \large$-\frac{1}{10}$ & \multicolumn{1}{l|}{\large$-\frac{3}{5}$} \\[2ex] \hline                 
+\end{tabular}
+\end{center}
+\end{table}
+
+Aus der Tabelle können wir die erste optimale Lösung ablesen mit $x^* = (\frac{3}{2}, \frac{5}{2})$. In Abbildung \ref{fig:gomory-example} (a) wird dies graphisch verdeutlicht.\\
+Da es sich dabei um eine nicht-ganzzahlige Lösung handelt muss nun der Gomory-Algorithmus angewendet werden. Dazu selektieren wir die erste Zeile, in der eine Basis-Variable vorkommt und $\bar{a}_{i0}$ keine Ganzzahl ist.\\
+Wir selektieren also die zweite Zeile in dieser Form:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel It 1}
+x_2 + \frac{1}{10} x_3 + \frac{2}{5} x_4 = \frac{5}{2}
+\end{align}
+\normalsize
+
+Nach dem Gomory-Verfahren müssen wir nun die Koeffizienten der Nicht-Basis-Variablen abrunden um unsere Schnittebene zu erhalten:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel It 1 - 2}
+x_2 + \lfloor \frac{1}{10}\rfloor x_3 + \lfloor\frac{2}{5}\rfloor x_4 &\leq x_2 + \frac{1}{10} x_3 + \frac{2}{5} x_4 = \frac{5}{2} \nonumber \\
+x_2 &\leq \lfloor \frac{5}{2} \rfloor \nonumber \\
+x_2 &\leq 2
+\end{align}
+\normalsize
+
+Unsere ILP in Normalform sieht mit der neuen Bedingung dann wie folgt aus:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel-ILP-Normal-It2}
+minimize \;\; x_1 - 2x_2 & \nonumber \\
+subject \;\; to \;\; -4x_1 + 6x_2 + x_3 &= 9 \nonumber \\
+x_1 + x_2 + x_4 &= 4 \nonumber \\
+x_2 + x_5 &= 2 \nonumber \\
+x_1, ..., x_5 &\geq 0 \nonumber \\
+x_1, ..., x_5 \;\; &integer
+\end{align}
+\normalsize
+
+\subsubsection*{2. Iteration}
+
+Wir führen nun erneut den Simplex-Algorithmus aus und erhalten dann wieder ein optimales Tableau. Dort lässt sich die neue optimale Lösung ablesen mit $x^{**} = (\frac{3}{4}, 2)$. Abbildung \ref{fig:gomory-example} (b) zeigt die neue optimale Lösung die durch den vorher bestimmten Schnitt (rote Farbe) ermittelt werden konnte.\\
+Aus dem optimalen Tableau wählen wir wieder eine Zeile. Auf ein erneutes Darstellen des optimalem Tableau wird an dieser Stelle verzichtet. Unsere gewählte Zeile hat folgende Form:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel It 2 schritt 1}
+x_1 - \frac{1}{4} x_3 + \frac{6}{4} x_5 = \frac{3}{4}
+\end{align}
+\normalsize
+
+Auch hier wird wieder das Gomory-Verfahren angewendet mit folgendem Ergebnis:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel It 2 schritt 2}
+x_1 - x_3 + x_5 \leq 0
+\end{align}
+\normalsize
+
+Im Gegensatz zur ersten Iteration ist das Ergebnis in dieser Form noch nicht verwertbar. Stattdessen verwenden wir die Normalform aus Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal-It2} und lösen die Bedingungen nach den Variablen $x_3$ und $x_4$ auf damit wir diese nicht mehr im endgültigen Ergebnis haben:
+
+\large
+\begin{align}
+\label{Eq:Gomory-Beispiel It 2 schritt 3}
+x_1 - \overbrace{(4x_1 - 6x_2 + 9)}^{1. Bedingung} + \overbrace{(2 - x_2)}^{3. Bedingung} &\leq 0 \nonumber \\
+3x_1 + 5x_2 - 7 &\leq 0 \nonumber \\
+-3x_1 + 5x_2 &\leq 7
+\end{align}
+\normalsize
+
+Somit haben wir einen neuen Schnitt mit $-3x_1 + 5x_2 \leq 7$ ermittelt welcher uns zur nächsten Iteration führt.
+
+\subsubsection*{3. Iteration}
+
+Zum wiederholten Male führen wir den Simplex-Algorithmus aus und bilden das optimale Tableau. Das Ablesen aus dem optimalem Tableau zeigt uns die neue optimale Lösung mit $x^{***} = (1, 2)$, welche eine ganzzahlige Lösung und somit die gesuchte optimale Lösung zur ILP ist.\\
+Abbildung \ref{fig:gomory-example} zeigt $x^{***}$ in Dunkelgrün und den zuletzt ermittelten Schnitt in Blau.
 
 \section{Branch and Bound}
 
