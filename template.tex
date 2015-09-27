@@ -18,6 +18,7 @@
 \usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{tikz}
+\usetikzlibrary{arrows,chains,matrix,positioning,scopes}
 
 %%% Make the ``BibTeX'' word pretty...
 
@@ -220,7 +221,7 @@ Durch den Zwischenschritt ist es jetzt möglich das $\bar{a}_{i0}$ ebenfalls abz
 \end{align}
 \normalsize
 
-Diese neue Ungleichung \ref{Eq:Gomory-Bedingung} ist unsere neue Schnitt-Bedingung da sie alle zulässigen nicht-ganzzahligen Lösungen hinter dieser Schnittebene \textit{abschneidet}.\\
+Diese neue Ungleichung \ref{Eq:Gomorybedingung} ist unsere neue Schnitt-Bedingung da sie alle zulässigen nicht-ganzzahligen Lösungen hinter dieser Schnittebene \textit{abschneidet}.\\
 Durch Hinzufügen der neuen Bedingung zur LP-Relaxierung lässt sich nun erneut der Simplex-Algorithmus durchführen. Dies wird solange wiederholt bis eine ganzzahlige Lösung gefunden wird.
 
 \subsection*{Beispiel des Gomory-Verfahren}
@@ -338,7 +339,7 @@ x_1 - x_3 + x_5 \leq 0
 \end{align}
 \normalsize
 
-Im Gegensatz zur ersten Iteration ist das Ergebnis in dieser Form noch nicht verwertbar. Stattdessen verwenden wir die Normalform aus Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal-It2} und lösen die Bedingungen nach den Variablen $x_3$ und $x_4$ auf damit wir diese nicht mehr im endgültigen Ergebnis haben:
+Im Gegensatz zur ersten Iteration ist das Ergebnis in dieser Form noch nicht verwertbar. Stattdessen verwenden wir die Normalform aus Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal-It2} und lösen die Bedingungen nach den Variablen $x_3$ und $x_5$ auf damit wir diese nicht mehr im endgültigen Ergebnis haben:
 
 \large
 \begin{align}
@@ -354,10 +355,38 @@ Somit haben wir einen neuen Schnitt mit $-3x_1 + 5x_2 \leq 7$ ermittelt welcher 
 \subsubsection*{3. Iteration}
 
 Zum wiederholten Male führen wir den Simplex-Algorithmus aus und bilden das optimale Tableau. Das Ablesen aus dem optimalem Tableau zeigt uns die neue optimale Lösung mit $x^{***} = (1, 2)$, welche eine ganzzahlige Lösung und somit die gesuchte optimale Lösung zur ILP ist.\\
-Abbildung \ref{fig:gomory-example} zeigt $x^{***}$ in Dunkelgrün und den zuletzt ermittelten Schnitt in Blau.
+Abbildung \ref{fig:gomory-example} (c) zeigt $x^{***}$ in Dunkelgrün und den zuletzt ermittelten Schnitt in Blau.
 
 \section{Branch and Bound}
 
+Ein weiterer exakter Algorithmus zur Lösung von ILPs ist der sogenannte \textit{Branch-and-Bound-Algorithmus}. Dazu betrachten wir die Menge aller zulässigen (feasible) Lösungen $F$ einer LP-Relaxierung. Dabei sei $x$ die optimale Lösung aus der Menge $F$:
+
+\large
+\begin{align}
+\label{Eq:Branching-Grundlage}
+minimize \;\; c'x & \nonumber \\
+subject \;\; to \;\; x &\in F
+\end{align}
+\normalsize
+
+\subsection*{Branching}
+
+Ähnlich wie beim Schnittebenenverfahren wird zuerst die LP-Relaxierung gelöst. Dies kann ebenfalls mittels Simplex-Algorithmus geschehen.\\
+Sei $x^*$ nun die optimale Lösung zur LP-Relaxierung. Ist $x^*$ nicht ganzzahlig, dann unterteilen wir die Menge der zulässigen Lösungen $F$ in zwei Untermengen $F_1$ und $F_2$, die jeweils $x^*$ nicht enthalten.\\
+Für beide Teilprobleme versuchen wir erneut eine Lösung zu berechnen und unterteilen gegebenenfalls erneut in Teilprobleme $F_i$ und $F_{i+1}$.
+
+Durch das ständige Aufteilen in Teilprobleme kann sich die optimale Lösung $x$ nur in einem Teilproblem befinden und unsere LP-Relaxierung sieht dann wie folgt aus:
+
+\large
+\begin{align}
+\label{Eq:Branching-Teilprobleme-Grundlage}
+minimize \;\; c'x & \nonumber \\
+subject \;\; to \;\; x &\in F_i \;\;\;\;\;\;\;\; i=1,...,k
+\end{align}
+\normalsize
+
+\begin{figure}[ht]
+\centering
 \begin{tikzpicture}[level/.style={sibling distance=60mm/#1}]
 \node [circle,draw] (z){$F$}
 	child { node [circle,draw] (a){$F_{1}$}
@@ -371,27 +400,217 @@ Abbildung \ref{fig:gomory-example} zeigt $x^{***}$ in Dunkelgrün und den zuletz
 
 ;
 \end{tikzpicture}
+\caption{Beispielhafte Darstellung eines Branching-Vorgangs.}
+\label{fig:Branching-Baum}
+\end{figure}
 
-Please use a serif (Times, Times New Roman, etc.) typeface for the
-body of your content. This serif typeface should be used for
-everything except the title of your content and section headings,
-which should be set in a sans-serif (Helvetica, etc.) typeface.
+Abbildung \ref{fig:Branching-Baum} zeigt einen solchen Vorgang dargestellt als Binärbaum. Dieser Vorgang wird auch als \textit{Branching} bezeichnet.
 
-Your content should be prepared with 9-point text and 10-point line
-spacing. This includes the references section. Do not reduce the
-typeface size or the line spacing of any part of your content, in an
-effort to fit more into a specific number of pages. 
+\subsection*{Bounding}
 
-All typefaces used in your content must be embedded in the PDF you
-create. 
+Wir betrachten nun ein beliebiges Teilproblem $F_i$ und eine obere Schranke $U$ mit dem Anfangswert $U = \infty$. \\
+Ein beliebiger effizienter Algorithmus (z.B. Simplex-Algorithmus) berechnet die untere Schranke $b(F_i)$ des Teilproblems $F_i$ der LP-Relaxierung mit:
 
-Paragraphs are prepared without any indentation on the first line, and
-with a 10-point-tall space between paragraphs.
+\large
+\begin{align}
+\label{Eq:Bounding-Untere-Schranke}
+b(F_i) \leq \min_{x \in F_i} c'x
+\end{align}
+\normalsize
 
-Please do not add page numbers to your content. They will be added
-during production.
+Mit der berechneten unteren Schranke $b(F_i)$ ist dann wie folgt zu verfahren:
+\begin{enumerate}
+\item Fall $b(F_i) \geq U$: Teilproblem $F_i$ ist nicht weiter zu beachten. Fahre mit nächstem Teilproblem fort.
+\item Fall $b(F_i) < U$: Sei $x^*$ die berechnete optimale Lösung von $F_i$:
+
+\begin{itemize}
+\item Falls $x^*$ ganzzahlig: Setze $U = b(F_i)$. Fahre mit nächstem Teilproblem fort falls vorhanden.
+\item Falls $x^*$ nicht ganzzahlig: Unterteile in weitere Teilprobleme $F_{i+1}$ und $F_{i+2}$. Fahre mit nächstem Teilproblem fort.
+\end{itemize}
+\end{enumerate}
+
+Durch diese Vorgehensweise wird sichergestellt, dass überflüssige Teilprobleme nicht berechnet werden und der Algorithmus erst dann terminiert, wenn eine ganzzahlige optimale Lösung mit minimaler unterer Schranke $b(F_i)$ gefunden wurde. Man bezeichnet dies als \textit{Bounding}.
+
+\subsection*{Wahl der Teilprobleme}
+
+Die Teilprobleme werden beim Branch-and-Bounding durch \textit{Breitensuche (BFS)}, \textit{Tiefensuche (DFS)} oder einem Mix aus beidem gewählt. Dies unterliegt keinem bestimmtem Vorgehen.\\
+Die Unterteilung der Teilprobleme wird nach der Berechnung einer optimalen Lösung $x^*$ durch ab- und aufrunden einer Lösungskomponente erreicht. Angenommen $x^*_i$ eines beliebigen Teilproblems $F_i$ sei nicht ganzzahlig. Dann erhält das Teilproblem $F_{i+1}$ die zusätzliche Bedingung $x_i \leq \lfloor x^*_i \rfloor$ während das Teilproblem $F_{i+2}$ die zusätzliche Bedingung $x_i \geq \lceil x^*_i \rceil$ erhält.
+
+\subsection*{Beispiel 1}
+
+\begin{figure*}[t!]
+  \centering
+  \includegraphics[scale=0.40]{images/bab-example}
+  \caption{Graphische Darstellung des Branch-and-Bound-Beispiel 1. (a) zeigt die erste optimale nicht-ganzzahlige Lösung $x^{*}$. (b) zeigt in roter Farbe die ersten beiden Teilprobleme nach oben und nach unten. In Blau die zweite optimale nicht-ganzzahlige Lösung $x^{**}$ der LP-Relaxierung. (c) zeigt in Blau die neuen Teilprobleme nach links und rechts und die optimale ganzzahlige Lösung $x^{***}$ der ILP. }
+  \label{fig:bab-example1}
+\end{figure*}
+
+Als erstes Beispiel betrachten wir die ILP aus Gleichung \ref{Eq:Gomory-Beispiel-ILP} - das selbe Beispiel aus dem Gomory-Verfahren. Die dazugehörige Normalform findet sich in Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal} wieder.
+
+\subsubsection*{Anfangsproblem $F$}
+
+Wir lösen die LP-Relaxierung zur Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal} via Simplex-Verfahren und erhalten als optimale Lösung $x^* = (\frac{3}{2}, \frac{5}{2})$ und die untere Schranke $b(F) = - \frac{7}{2}$ (Untere Schranke lässt sich ebenfalls aus dem optimalem Tableau ablesen - siehe dazu Tabelle \ref{Tb:Optimales Tableau Gomory Beispiel}).
+
+Da unsere obere Schranke den Anfangswert $U = \infty$ besitzt gilt für das Anfangsproblem $b(F) < U$. Unsere Lösung $x^*$ ist nicht ganzzahlig, demnach unterteilen wir das Problem in zwei Teilprobleme mit $F_1$ mit zusätzlicher Bedingung $x_2 \geq 3$ und $F_2$ mit zusätzlicher Bedingung $x_2 \leq 2$.
+
+\subsubsection*{Teilproblem $F_1$}
+
+Das Teilproblem $F_1$ besitzt keine zulässigen Lösungen und muss deshalb nicht weiter beachtet werden. Dies geht besonders gut aus Abbildung \ref{fig:bab-example1} (b) hervor, in der klar ersichtlich ist, dass die Bedingung $x_2 > 3$ außerhalb der Fläche der zulässigen Lösungen liegt.
+
+\subsubsection*{Teilproblem $F_2$}
+
+Für das Teilproblem $F_2$ lösen wir erneut die LP-Relaxierung und erhalten die optimale Lösung $x^{**} = (\frac{3}{4}, 2)$ und die untere Schranke $b(F_2) = -3,25$.
+
+Auch bei diesem Teilproblem ist $b(F_2) < U$ und die optimale Lösung nicht ganzzahlig. Wir unterteilen das Problem in zwei weitere Teilprobleme $F_3$ mit zusätzlicher Bedingung $x_1 \geq 1$ und $F_4$ mit zusätzlicher Bedingung $x_1 \leq 0$.
+
+\subsubsection*{Teilproblem $F_3$}
+
+Wir wiederholen auch hier unsere Vorgehensweise und erhalten die optimale Lösung $x^{***} = (1, 2)$ und die untere Schranke $b(F_3) = -3$.
+
+Da wir dieses Mal eine ganzzahlige Lösung gefunden haben und $b(F_3) < U$ ist, setzen wir $U = -3$. Wir fahren mit dem nächsten Teilproblem fort.
+
+\subsubsection*{Teilproblem $F_4$}
+
+Der Simplex-Algorithmus liefert uns für das Teilproblem $F_4$ die optimale Lösung $x^{(4)} = (0, \frac{3}{2})$ und die untere Schranke $b(F_4) = -3$.
+
+Da für dieses Teilproblem gilt $b(F_4) = U$ müssen wir dieses Teilproblem nicht weiter beachten und haben in Teilproblem $F_3$ unsere ganzzahlige optimale Lösung für die ILP aus Gleichung \ref{Eq:Gomory-Beispiel-ILP} gefunden.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[level/.style={sibling distance=60mm/#1}]
+\node [circle,draw] (z){$F$}
+	child { node [circle,draw,fill=lightgray,font=\sffamily\bfseries] (a){$F_{1}$}
+	}
+	child { node [circle,draw] (b){$F_{2}$}
+		child { node [circle,draw,fill=green,font=\bfseries] (c){$F_{3}$}
+		}
+		child { node [circle,draw,fill=lightgray,font=\sffamily\bfseries] (d){$F_{4}$}
+		}
+	}
+
+;
+\end{tikzpicture}
+\caption{Darstellung des Beispiels als Binärbaum. Graue Knoten sind Teilprobleme die nicht weiter beachtet worden sind. Der grüne Knoten lieferte die Lösung zur ILP.}
+\label{fig:Branch-And-Bound-Bsp1}
+\end{figure}
+
+Abbildung \ref{fig:bab-example1} (c) zeigt die Aufteilung der Teilprobleme mit entsprechenden Bedingungen und Abbildung \ref{fig:Branch-And-Bound-Bsp1} zeigt die Lösungsfindung als Binärbaum.
+
+\subsection*{Beispiel: Traveling-Salesman-Problem (TSP)} 
+
+Ein weiteres Beispiel für den Einsatz von Branch-and-Bound ist das Traveling-Salesman-Problem. Dabei handelt es sich um einen gerichteten Graphen $G = (V,E)$ mit $n$ Knoten und $c_{ij}$ Kosten für jede Kante.\\
+Ziel des TSPs ist es, innerhalb eines Graphen alle Knoten mindestens einmal zu besuchen mit minimalen Kosten und dann wieder zum Ursprungsknoten zurückzukehren.
+
+Nun möchten wir das TSP als ILP umformulieren und definieren die Bedingungen wie folgt:\\
+Falls $i$ und $j$ aufeinander folgende Knoten sind, so ist $x_{ij} = 1$, andernfalls $x_{ij} = 0$ (siehe Abbildung \ref{fig:tsp-knoten}).
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+	level/.style={sibling distance=60mm/#1},
+	every matrix/.style={ampersand replacement=\&,column sep=2cm,row sep=2cm}]
+\matrix {
+	\node[circle,draw] (i) {$i$};
+      \& \node[circle,draw] (j) {$j$}; \& \\
+};
+
+\draw[->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize] (i) -- node[midway,above] { $c_{ij}$ } (j);
+
+\end{tikzpicture}
+\caption{Beispiel zweier aufeinander folgender Knoten $i$ und $j$ mit Kosten $c_{ij}$.}
+\label{fig:tsp-knoten}
+\end{figure}
+
+Die dazugehörige ILP sieht nun so aus:
+
+\large
+\begin{align}
+\label{Eq:TSP-Zuordnung}
+minimize \;\; &\sum^{n}_{i=1}\sum^{n}_{j=1} c_{ij}x_{ij}& \nonumber \\
+subject \;\; to \;\; &\sum^{n}_{i=1}x_{ij} = 1 \;\;\;\;\;\;i = 1,...,n \nonumber \\
+&\sum^{n}_{j=1}x_{ij} = 1 \;\;\;\;\;\;j = 1,...,n \nonumber \\
+& x_{ij} \in \{0, 1\}
+\end{align}
+\normalsize
+
+Die Formulierung der ILP aus Gleichung \ref{Eq:TSP-Zuordnung} ist auch als das sogenannte \textit{Zuordnungsproblem} bekannt.\\
+Dies bringt allerdings eine gewisse Problematik mit sich, denn nicht jede Lösung des Zuordnungsproblems ist eine valide Lösung des TSPs. Dazu betrachten wir Abbildung \ref{fig:tsp-result}.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+	level/.style={sibling distance=60mm/#1},
+	every matrix/.style={ampersand replacement=\&,column sep=2cm,row sep=2cm},
+	to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize}]
+\matrix {
+	\node[circle,draw] (a) {$1$};
+      \& \node[circle,draw] (b) {$2$}; 
+      \& \node[circle,draw] (c) {$3$}; \& \\
+    \node[circle,draw] (d) {$4$};
+      \& \node[circle,draw] (e) {$5$}; 
+      \& \node[circle,draw] (f) {$6$}; 
+      \& \node[circle,draw] (g) {$7$}; \& \\
+};
+
+\draw[to] (a) -- node[midway,above] {} (b);
+\draw[to] (b) -- node[midway,above] {} (e);
+\draw[to] (e) -- node[midway,above] {} (d);
+\draw[to] (d) -- node[midway,above] {} (a);
+
+\draw[to] (c) -- node[midway,above] {} (f);
+\draw[to] (f) -- node[midway,above] {} (g);
+\draw[to] (g) -- node[midway,above] {} (c);
+
+\end{tikzpicture}
+\caption{Beispiel für eine Lösung des Zuordnungsproblem mit sieben Knoten aber keine valide Lösung für das TSP.}
+\label{fig:tsp-result}
+\end{figure}
+
+Durch den Einsatz von Branch-and-Bound lässt sich allerdings eine Lösung zum TSP finden. Sobald man ein solchen Ergebnis wie in Abbildung \ref{fig:tsp-result} hat, unterteilt man das Problem in weitere Teilprobleme. Beispielsweise verbietet man die Kante zwischen den Knoten $2$ und $3$ in dem man die zusätzliche Bedingung $x_{23} = 0$ in das eine Teilproblem und $x_{67} = 0$ in ein weiteres Teilproblem einfügt. Abbildung \ref{fig:tsp-tree} stellt dies graphisch dar.\\
+Mit dieser neuen Bedingung versucht man erneut eine Lösung zu finden. Dies wiederholt man solange mit neuen Bedingungen bis man eine valide Lösung zum TSP erhalten hat.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[level/.style={sibling distance=20mm/#1}]
+\node [circle,draw] (z){$F$}
+	child { node [shape=rectangle, rounded corners,draw] (a){$F_1: x_{12} = 0$}
+	}
+	child { node [shape=rectangle, rounded corners,draw] (b){$F_2: x_{23} = 0$}
+		child { node [] (e){...}
+		}
+		child { node [] (f){...}
+		}
+		child { node [] (g){...}
+		}
+	}
+	child { node [shape=rectangle, rounded corners,draw] (c){$F_3: x_{34} = 0$}
+	}
+	child { node [] (d){...}
+	}
+
+;
+\end{tikzpicture}
+\caption{Darstellung der möglichen Teilprobleme aus Abbildung \ref{fig:tsp-result}.}
+\label{fig:tsp-tree}
+\end{figure}
 
 \section{Branch and Cut}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 The title, author, and affiliation information should be centered
 above the body of your content. The title should be set in a 14-point
