@@ -35,7 +35,7 @@
 \TOGvolume{0}
 \TOGnumber{0}
 
-\title{Ausarbeitung zum Thema der ganzzahligen lineare Programmierung (ILP)}
+\title{Ausarbeitung zum Thema der ganzzahligen linearen Programmierung (ILP)}
 
 \author{Patric Vormstein\\Seminar Lineare und ganzzahlige lineare Programmierung, SoSe 2015\\Leitung: Prof. Dr. Ernst Althaus}
 \pdfauthor{Stephen N. Spencer}
@@ -48,8 +48,8 @@
 %%% the title and author information, and above the body of the content.
 
  \teaser{
-   \includegraphics[height=1.5in]{images/sampleteaser}
-   \caption{Spring Training 2009, Peoria, AZ.}
+   \includegraphics[height=1.8in]{images/teaser}
+   \caption{Beispielhafte Darstellungen der Algorithmen die in dieser Ausarbeitung vorgestellt werden. (a) zeigt das Gomory-Schnittebenenverfahren. (b) stellt den Branch-and-Bound-Algorithmus dar. (c) ist eine Dartstellung des Branch-and-Cut-Verfahrens.}
  }
 
 \maketitle
@@ -59,8 +59,8 @@
 Diese Ausarbeitung setzt sich mit der ganzzahligen linearen Programmierung (oder ILP für \textit{integer linear programming}) auseinander und stellt drei exakte Algorithmen zum Lösen von ganzzahligen linearen Problemen vor.\\
 Dabei handelt es sich um das Gomory-Schnittebenenverfahren, dem Branch-and-Bound-Algorithmus und ein Verfahren, dass die Vorteile beider Algorithmen nutzt, und zwar das Branch-and-Cut.\\
 Ein besonderes Augenmerk soll hier auf die praktische Anwendung der Algorithmen gelegt werden.\\
-Für diese Ausarbeitung werden nichtlineare Probleme, feasible bzw. zulässige Lösungen und der Simplex-Algorithmus (inkl. optimalem Tableau) als bekannt vorausgesetzt.\\
-Desweiteren liegt dieser Ausarbeitung das Buch ... zugrunde.
+Für diese Ausarbeitung werden nicht-ganzzahlige lineare Probleme (LP), feasible bzw. zulässige Lösungen und der Simplex-Algorithmus (inkl. optimalem Tableau) als bekannt vorausgesetzt.\\
+Desweiteren liegt dieser Ausarbeitung das Buch \textit{Introduction to linear Optimization} (Kapitel 11, S. 479 - 490) von \textsc{Dimitris Bertsimas} und \textsc{John N. Tsitsiklis} zugrunde.
 \end{abstract}
 
 %% Required for all content. 
@@ -221,7 +221,7 @@ Durch den Zwischenschritt ist es jetzt möglich das $\bar{a}_{i0}$ ebenfalls abz
 \end{align}
 \normalsize
 
-Diese neue Ungleichung \ref{Eq:Gomorybedingung} ist unsere neue Schnitt-Bedingung da sie alle zulässigen nicht-ganzzahligen Lösungen hinter dieser Schnittebene \textit{abschneidet}.\\
+Diese neue Ungleichung \ref{Eq:Gomory-Bedingung} ist unsere neue Schnittbedingung da sie alle zulässigen nicht-ganzzahligen Lösungen hinter dieser Schnittebene \textit{abschneidet}.\\
 Durch Hinzufügen der neuen Bedingung zur LP-Relaxierung lässt sich nun erneut der Simplex-Algorithmus durchführen. Dies wird solange wiederholt bis eine ganzzahlige Lösung gefunden wird.
 
 \subsection*{Beispiel des Gomory-Verfahren}
@@ -270,14 +270,14 @@ Nach Anwendung des Simplex-Algorithmus erhalten wir folgendes optimales Tableau:
 \centering
 \caption{Optimales Tableau zum Gomory-Beispiel in der ersten Iteration}
 \label{Tb:Optimales Tableau Gomory Beispiel}
-\begin{tabular}{*5{>{\centering\arraybackslash}m{20pt}} @{}m{0pt}@{}}
-%\begin{tabular}{MMMMM}
+%\begin{tabular}{*5{>{\centering\arraybackslash}m{20pt}} @{}m{0pt}@{}}
+\begin{tabular}{ccccc}
 %\begin{tabular}{>{\centering\bfseries}m{30pt} >{\centering}m{30pt} >{\centering}m{30pt} >{\centering}m{30pt} >{\centering\arraybackslash}m{30pt}}
 & $x_1$ & $x_2$  & $x_3$ & $x_4$ \\
 \hline
-\multicolumn{1}{|l|}{\large$-\frac{7}{2}$} & \large$0$  & \large$0$ & \large$-\frac{3}{10}$ & \multicolumn{1}{l|}{\large$-\frac{1}{5}$} \\[2ex] \hline
-\multicolumn{1}{|l|}{\large$\frac{5}{2}$} & \large$0$ & \large$1$ & \large$\frac{1}{10}$ & \multicolumn{1}{l|}{\large$\frac{2}{5}$} \\[2ex]
-\multicolumn{1}{|l|}{\large$\frac{3}{2}$} & \large$1$ & \large$0$ & \large$-\frac{1}{10}$ & \multicolumn{1}{l|}{\large$-\frac{3}{5}$} \\[2ex] \hline                 
+\multicolumn{1}{|c|}{\rule{0pt}{3.5ex}\large$-\frac{7}{2}$} & \large$0$  & \large$0$ & \large$-\frac{3}{10}$ & \multicolumn{1}{c|}{\large$-\frac{1}{5}$} \\[2ex] \hline
+\multicolumn{1}{|c|}{\rule{0pt}{3.5ex}\large$\frac{5}{2}$} & \large$0$ & \large$1$ & \large$\frac{1}{10}$ & \multicolumn{1}{c|}{\large$\frac{2}{5}$} \\[2ex]
+\multicolumn{1}{|c|}{\rule{0pt}{3.5ex}\large$\frac{3}{2}$} & \large$1$ & \large$0$ & \large$-\frac{1}{10}$ & \multicolumn{1}{c|}{\large$-\frac{3}{5}$} \\[2ex] \hline                 
 \end{tabular}
 \end{center}
 \end{table}
@@ -433,17 +433,17 @@ Durch diese Vorgehensweise wird sichergestellt, dass überflüssige Teilprobleme
 
 \subsection*{Wahl der Teilprobleme}
 
-Die Teilprobleme werden beim Branch-and-Bounding durch \textit{Breitensuche (BFS)}, \textit{Tiefensuche (DFS)} oder einem Mix aus beidem gewählt. Dies unterliegt keinem bestimmtem Vorgehen.\\
-Die Unterteilung der Teilprobleme wird nach der Berechnung einer optimalen Lösung $x^*$ durch ab- und aufrunden einer Lösungskomponente erreicht. Angenommen $x^*_i$ eines beliebigen Teilproblems $F_i$ sei nicht ganzzahlig. Dann erhält das Teilproblem $F_{i+1}$ die zusätzliche Bedingung $x_i \leq \lfloor x^*_i \rfloor$ während das Teilproblem $F_{i+2}$ die zusätzliche Bedingung $x_i \geq \lceil x^*_i \rceil$ erhält.
-
-\subsection*{Beispiel 1}
-
 \begin{figure*}[t!]
   \centering
   \includegraphics[scale=0.40]{images/bab-example}
   \caption{Graphische Darstellung des Branch-and-Bound-Beispiel 1. (a) zeigt die erste optimale nicht-ganzzahlige Lösung $x^{*}$. (b) zeigt in roter Farbe die ersten beiden Teilprobleme nach oben und nach unten. In Blau die zweite optimale nicht-ganzzahlige Lösung $x^{**}$ der LP-Relaxierung. (c) zeigt in Blau die neuen Teilprobleme nach links und rechts und die optimale ganzzahlige Lösung $x^{***}$ der ILP. }
   \label{fig:bab-example1}
 \end{figure*}
+
+Die Teilprobleme werden beim Branch-and-Bounding durch \textit{Breitensuche (BFS)}, \textit{Tiefensuche (DFS)} oder einem Mix aus beidem gewählt. Dies unterliegt keinem bestimmtem Vorgehen.\\
+Die Unterteilung der Teilprobleme wird nach der Berechnung einer optimalen Lösung $x^*$ durch ab- und aufrunden einer Lösungskomponente erreicht. Angenommen $x^*_i$ eines beliebigen Teilproblems $F_i$ sei nicht ganzzahlig. Dann erhält das Teilproblem $F_{i+1}$ die zusätzliche Bedingung $x_i \leq \lfloor x^*_i \rfloor$ während das Teilproblem $F_{i+2}$ die zusätzliche Bedingung $x_i \geq \lceil x^*_i \rceil$ erhält.
+
+\subsection*{Beispiel 1}
 
 Als erstes Beispiel betrachten wir die ILP aus Gleichung \ref{Eq:Gomory-Beispiel-ILP} - das selbe Beispiel aus dem Gomory-Verfahren. Die dazugehörige Normalform findet sich in Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal} wieder.
 
@@ -496,10 +496,10 @@ Da für dieses Teilproblem gilt $b(F_4) = U$ müssen wir dieses Teilproblem nich
 
 Abbildung \ref{fig:bab-example1} (c) zeigt die Aufteilung der Teilprobleme mit entsprechenden Bedingungen und Abbildung \ref{fig:Branch-And-Bound-Bsp1} zeigt die Lösungsfindung als Binärbaum.
 
-\subsection*{Beispiel: Traveling-Salesman-Problem (TSP)} 
-
 Ein weiteres Beispiel für den Einsatz von Branch-and-Bound ist das Traveling-Salesman-Problem. Dabei handelt es sich um einen gerichteten Graphen $G = (V,E)$ mit $n$ Knoten und $c_{ij}$ Kosten für jede Kante.\\
 Ziel des TSPs ist es, innerhalb eines Graphen alle Knoten mindestens einmal zu besuchen mit minimalen Kosten und dann wieder zum Ursprungsknoten zurückzukehren.
+
+\subsection*{Beispiel: Traveling-Salesman-Problem (TSP)} 
 
 Nun möchten wir das TSP als ILP umformulieren und definieren die Bedingungen wie folgt:\\
 Falls $i$ und $j$ aufeinander folgende Knoten sind, so ist $x_{ij} = 1$, andernfalls $x_{ij} = 0$ (siehe Abbildung \ref{fig:tsp-knoten}).
@@ -562,11 +562,11 @@ Dies bringt allerdings eine gewisse Problematik mit sich, denn nicht jede Lösun
 \draw[to] (g) -- node[midway,above] {} (c);
 
 \end{tikzpicture}
-\caption{Beispiel für eine Lösung des Zuordnungsproblem mit sieben Knoten aber keine valide Lösung für das TSP.}
+\caption{Beispiel für eine Lösung des Zuordnungsproblem mit sieben Knoten aber keine valide Lösung zum TSP.}
 \label{fig:tsp-result}
 \end{figure}
 
-Durch den Einsatz von Branch-and-Bound lässt sich allerdings eine Lösung zum TSP finden. Sobald man ein solchen Ergebnis wie in Abbildung \ref{fig:tsp-result} hat, unterteilt man das Problem in weitere Teilprobleme. Beispielsweise verbietet man die Kante zwischen den Knoten $2$ und $3$ in dem man die zusätzliche Bedingung $x_{23} = 0$ in das eine Teilproblem und $x_{67} = 0$ in ein weiteres Teilproblem einfügt. Abbildung \ref{fig:tsp-tree} stellt dies graphisch dar.\\
+Durch den Einsatz von Branch-and-Bound lässt sich allerdings eine Lösung zum TSP finden. Sobald man ein solches Ergebnis wie in Abbildung \ref{fig:tsp-result} berechnet hat, unterteilt man das Problem in weitere Teilprobleme. Beispielsweise verbietet man die Kante zwischen den Knoten $2$ und $3$ in dem man die zusätzliche Bedingung $x_{23} = 0$ in ein neues Teilproblem einfügt. Eine weitere verbotene Kante $x_{34}$ könnte man als zusätzliche Bedingung in ein anderes Teilproblem einfügen. Abbildung \ref{fig:tsp-tree} stellt dies graphisch dar.\\
 Mit dieser neuen Bedingung versucht man erneut eine Lösung zu finden. Dies wiederholt man solange mit neuen Bedingungen bis man eine valide Lösung zum TSP erhalten hat.
 
 \begin{figure}[ht]
@@ -596,218 +596,82 @@ Mit dieser neuen Bedingung versucht man erneut eine Lösung zu finden. Dies wied
 
 \section{Branch and Cut}
 
+Als letztes betrachten wir einen letzten exakten Algorithmus und zwar den sogenannten \textit{Branch-and-Cut-Algorithmus}.\\
+Dieser stellt streng genommen keinen eigenen oder neuen Algorithmus dar, sondern nutzt die Methoden aus dem Schnittebenenverfahren und dem Branch-and-Bound-Algorithmus.\\
+Durch geschicktes Wählen von Schnittebenen oder Unterteilung in Teilproblemen lässt sich die Lösungssuche deutlich verschnellern.
 
+\subsection*{Beispiel}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The title, author, and affiliation information should be centered
-above the body of your content. The title should be set in a 14-point
-bold sans-serif typeface with 18-point line spacing. The author and
-affiliation information should be set in a 10-point serif typeface
-with 12-point line spacing.
-
-The title should be appropriately capitalized. ``All caps'' is not
-appropriate. The following link provides assistance with appropriate
-capitalization:
-
-{\small\url{http://www.grammarbook.com/punctuation/capital.asp}}
-
-Affiliations should include your educational institution or employer's
-name, and a valid e-mail address.
-
-\section{The Basics: Section Headings}
-
-Section headings should be set in a 10-point bold sans-serif typeface
-and numbered - ``1'', ``2'', and so on. Subsection headings should be
-set in a 10-point bold sans-serif typeface and numbered - ``1.1'',
-``1.2'', and so on. Subsubsection headings should be set in a 10-point
-italic sans-serif typeface and numbered - ``1.2.1'', ``1.2.2'', and so
-on. A 10-point-tall space should separate a section heading and the
-next paragraph.
-
-\section{Abstract, Keywords, and CR Categories}
-
-Your content should begin with an abstract of about 150 words,
-describing the work and its contribution to the field.
-
-Authors of technical papers and technical briefs must also provide a
-set of user-generated keywords and a selection of CR categories, from
-the following link:
-
-{\small\url{http://www.acm.org/about/class/1998/}}
-
-Authors of other types of content may include CR categories and
-keywords at their discretion.
-
-\section{ACM Rights Management Text}
-
-You are required to leave a blank space at the base of the left column
-on the first page of your content for the ACM rights management
-text. This blank space will be one column wide, and one inch tall for
-all types of content except technical papers accepted to our annual
-(SIGGRAPH and SIGGRAPH Asia) conferences. In this case, the space must
-be 1.5 inches tall. (These technical papers are accepted as articles
-in the ACM ``Transactions on Graphics'' journal, and the rights
-management text is slightly different, and occupies more space.)
-
-\section{Figures and Tables and Captions}
-
-Figures and tables can span one or both columns. Captions for figures
-should be centered underneath the figure. Captions for tables should
-be centered above the table.
-
-\begin{table}[ht]
+\begin{figure*}[t!]
   \centering
-  \caption{A simple table.}
-  \begin{tabular}{|r|l|}
-    \hline
-    7C0 & hexadecimal \\
-    3700 & octal \\ \cline{2-2}
-    11111000000 & binary \\
-    \hline \hline
-    1984 & decimal \\
-    \hline
-  \end{tabular}
-\end{table}
-  
-Please use 9-point bold serif type for the caption title, and 9-point
-serif type for the caption text (both on 10-point line spacing).
+  \includegraphics[scale=0.40]{images/bac-example}
+  \caption{Graphische Darstellung des Branch-and-Cut-Beispiels. (a) zeigt die erste optimale nicht-ganzzahlige Lösung $x^{*}$. (b) zeigt in roter Farbe die ersten beiden Teilprobleme nach oben und nach unten. (c) zeigt in Blau den berechneten Gomory-Schnitt und die optimale ganzzahlige Lösung $x^{**}$ der ILP. }
+  \label{fig:bac-example}
+\end{figure*}
 
-\section{Citations and References}
+Wir betrachten erneut die ILP aus Gleichung \ref{Eq:Gomory-Beispiel-ILP} und die dazugehörige Normalform aus Gleichung \ref{Eq:Gomory-Beispiel-ILP-Normal}.\\
 
-\subsection{Citations}
+\subsubsection*{Anfangsproblem $F$}
 
-The SIGGRAPH citation format is the ``author year''
-format~\cite{Pellacini:2005:LAH}. The year is separated from the
-author by a single space~\cite{yee:2000:ssa}. Two authors are
-separated by the word ``and''~\cite{parke:1996:CFA}. More than two
-authors are represented by the primary author and ``et al.''~\cite{levoy:2000:TDM}.
+Wir beginnen die Lösungssuche durch Anwendung des Branch-and-Bound-Verfahrens. Unsere anfängliche obere Schranke ist $U = \infty$.\\
+Nach Anwendung des Simplex-Algorithmus erhalten wir die optimale Lösung $x^* = (\frac{3}{2}, \frac{5}{2})$ und $b(F) = - \frac{7}{2}$.
 
-Multiple citations at a single point in the content are separated by
-semicolons~\cite{levoy:2000:TDM,sako:2001:SSB}.
+Da $b(F) < U$ unterteilen wir das Problem in zwei Teilprobleme $F_1$ mit $x_2 \geq 3$ und $F_2$ mit $x_2 \leq 2$.
 
-When the last name of the cited author is part of the text, it may be
-omitted from the citation: ``\ldots as shown in Fedkiw et
-al.~\shortcite{fedkiw:2001:VSO}, the coefficient remains\ldots''
+\subsubsection*{Teilproblem $F_1$}
 
-\subsection{References}
+Das Teilproblem $F_1$ liefert uns keine zulässigen Lösungen. Es wird nicht weiter beachtet. Abbildung \ref{fig:bac-example} zeigt diesen Sachverhalt.
 
-The reference list, or bibliography, must be unnumbered, alphabetized
-by the primary author's last name, followed by the year of publication
-and other identifying information (article title, journal title,
-volume, number, etc.). Author names are arranged as ``last name,
-initials.'' The page number, if any, is the last piece of information
-in the reference.
+\subsubsection*{Teilproblem $F_2$}
 
-The first line of each entry in the bibliography has no
-indentation. The second successive lines has a 2em
-indentation. 
+Wir versuchen nun das Teilproblem $F_2$ mittels dem Schnittebenenverfahren zu lösen. Dazu wenden wir den Simplex-Algorithmus an und erhalten dann nach Anwendung des Gomory-Verfahrens den folgenden Schnitt (dargestellt in Abbildung \ref{fig:bac-example}): 
 
-Please use 9-point serif type, with 10-point line spacing, for each
-entry in the bibliography, with a single blank line between each
-entry. 
+\large
+\begin{align}
+\label{Eq:Branch-and-Cut-Schnitt}
+- x_1 + x_2 \leq 1
+\end{align}
+\normalsize
 
-Journal, book, thesis, and conference proceedings titles are set in an
-italic serif type. {\sc Author names should be typeset in a ``Small
-Caps'' typeface.}
+Mit diesem Schnitt als neue Bedingung berechnen wir eine Lösung zur neuen LP-Relaxierung und erhalten als ganzzahlige optimale Lösung $x^{**} = (1, 2)$. Damit endet der Algorithmus.
 
-\section{Third-Party Material}
 
-If you are using third-party material in your content - that is,
-material which you or your co-authors did not create - you need to
-clearly identify it as such in the material itself or in the 
-content's caption, as shown in Figure~\ref{fig:ferrari}.
 
 \begin{figure}[ht]
-  \centering
-  \includegraphics[width=3.0in]{images/ferrari_laferrari}
-  \caption{Ferrari LaFerrari. Image courtesy Flickr user ``gfreeman23.''}
-  \label{fig:ferrari}
+\centering
+\begin{tikzpicture}[level/.style={sibling distance=60mm/#1}]
+\node [circle,draw] (z){$F$}
+	child { node [circle,draw,fill=lightgray,font=\sffamily\bfseries] (a){$F_{1}$}
+	}
+	child { node [circle,draw,fill=green,font=\bfseries] (b){$F_{2}$}
+	}
+
+;
+\end{tikzpicture}
+\caption{Darstellung des Branch-and-Cut-Baums. Der graue Knoten entspricht dem Teilproblem, welcher nicht weiter beachtet worden ist. Der grüne Knoten lieferte die Lösung zur ILP durch das Gomory-Schnittebenenverfahren.}
+\label{fig:Branch-And-Cut-Baum}
 \end{figure}
 
-ACM's policy on third-party material can be found at the following link:
+\subsubsection*{Beobachtung}
 
-{\small\url{http://www.acm.org/publications/third-party-material}}
+Bereits in diesem einfach gehaltenem Beispiel lässt sich beobachten, dass im Gegensatz zum einfachen Branch-and-Bound nur zwei Teilprobleme benötigt worden sind. Abbildung \ref{fig:Branch-And-Cut-Baum} verdeutlicht dies.\\
+In komplexeren Problemen kann diese Lösungsmethode zu einer deutlicheren Verkürzung der Lösungsfindung führen.
 
-\section{``Artistic Images'' and Copyright Transfer}
 
-ACM's rights management policy mandates that if copyright is
-transferred to ACM, and authors wish to retain copyright of one or
-more of their own images or figures in the content, they can identify
-them as ``artistic images'' by including the author's copyright notice
-in the image itself or in the caption.
+\section{Fazit}
 
-(Please note that only technical papers and technical briefs have
-copyright transfer as an option. All other forms of content have
-permission and licensing options, but not copyright transfer.)
+Wir haben nun drei exakte Algorithmen zum Lösen von ILPs kennengelernt.
 
-\section{Author-Prepared Versions of Final Content}
+Das Gomory-Schnittebenenverfahren ist ein simples Verfahren das auf dem Simplex-Algorithmus aufbaut. Es bietet uns die Möglichkeit durch ständiges Hinzufügen von Schnitten die Suche im Bereich der zulässigen Lösungen zu verfeinern.
 
-ACM's rights management policy provides for author-prepared versions
-of final content to be made available on the author's personal or
-employer's web site for distribution.
+Der Branch-and-Bound-Algorithmus basiert auf dem Aufteilen in Teilprobleme. Dadurch haben wir die Möglichkeit durch berechnen von Schranken gewisse Teilprobleme zu überspringen, da sie uns auf keinen Fall bessere Lösungen bieten können. Dies reduziert die Berechnungszeit der Lösung.
 
-The author is responsible for creating the article-specific notice and
-making it part of the PDF. The following is an example of such a
-notice. Yours will have the year, publication, and article DOI
-information specific to your final content.
+Durch Hinzunahme des Schnittebenenverfahrens zum Branch-and-Bound-Algorithmus erhalten wir das Branch-and-Cut-Verfahren. Teilprobleme können wir dann auch mittels Schnittberechnung lösen und unter Umständen in kürzer Berechnungszeit eine optimale Lösung berechnen. \\
+Da wir uns mit allen Algorithmen in exponentieller Laufzeit bewegen kann uns ein Branch-and-Cut deutlich Zeit sparen - auch wenn wir uns dann nicht in polynomieller Laufzeit befinden.
 
-\texttt{\small(c) 2009 ACM. This is the author's version of the work. It is posted here by permission of ACM for your personal use. Not for redistribution. The definitive version was published in ACM Transactions on Graphics 28(3), August 2009. http://doi.acm.org/10.1145/1576246.1531329.}
+Im Endeffekt bieten uns aber alle drei Algorithmen optimale Lösungen, da sie zur Gruppe der exakten Algorithmen gehören und haben damit einen Vorteil gegenüber Algorithmen die nur suboptimale Lösungen bieten. Bis zu einem gewissen Komplexitätsgrad sind also exakte Algorithmen zu bevorzugen.
 
-\section{Application-Specific Notes}
-
-\subsection{\LaTeX}
-
-The ``acmsiggraph'' \LaTeX{} class will faithfully implement the formatting specifications found in this document. Please look at the ``template.tex'' file that accompanies the \LaTeX\ and \BibTeX\ class files, noting these points:
-\begin{itemize}
-\item In order to leave the correct amount of space clear for the rights management text, you must do two things: 
-\begin{enumerate}
-\item Use the proper parameter to the \cs{documentclass} command at the top of your source file: use ``tog'' for technical papers accepted to our annual events and published as TOG articles, and use ``conference'' for all other types of content. The parameter determines the amount of space left clear for the rights management text.
-\item Use the \cs{copyrightspace} command. It should be placed immediately before the first section of your paper.
-\end{enumerate}
-If you do not use any parameter to the \cs{documentclass} command, and use the \cs{copyrightspace} command, you'll end up with much more blank space than you want or need.
-
-\item Many authors like to have a large image - called a ``teaser'' image - after the title, author, and affiliation and before the body of the paper. There is a command - \cs{teaser} - which can be used to place such an image. (As has been done in this example document.) Under certain circumstances, the space left clear for the rights management text will move to the base of the right column on the first page. This is acceptable.
-\item Use the \cs{keywords} command to define your own keywords, and the \cs{keywordlist} command to prepare and print that block of text.
-\item Use the \cs{CRcatlist} environment and the \cs{CRcat} command to define the CR categories appropriate for your paper.
-\item There are also ``review'' and ``preprint'' variations of this document class, to be used for material submitted for review, and accepted content to be distributed as a ``preprint.'' These variations have special commands associated with them; see the ``template.tex'' file for more information.
-\end{itemize}
-
-\subsection{Microsoft Word}
-
-The ``acmsiggraph.docx'' file will faithfully implement the formatting
-specifications found in this document.
-
-An appropriately-placed column break is one way to leave the right
-amount of space for the rights management text.
-
-\section{Proceedings Production}
-
-Your final content will be checked and, if found acceptable for publication, will have the appropriate page header and footer information and ACM rights management text added to it. 
-
-If your final content is not acceptable for publication - for example, unembedded typefaces, missing required elements, or modification of the format - you will be directed to correct these issues and submit a new version of your final content as soon as possible.
-
-\section{Contact Information}
-
-If you have questions or suggestions regarding this document, please
-contact Stephen Spencer at ``spencer@cs.washington.edu''.
-
-\section*{Acknowledgements}
-
-To Robert, for all the bagels.
-
+\newpage
 \bibliographystyle{acmsiggraph}
 \nocite{*}
 \bibliography{template}
